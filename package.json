@@ -1,0 +1,49 @@
+{
+  "name": "@ournet/quotes-data",
+  "version": "0.0.1",
+  "description": "Ournet quotes data module",
+  "main": "./lib/index.js",
+  "types": "./types/index.d.ts",
+  "scripts": {
+    "pretest": "npm run clean && npm run tsc",
+    "test": "ava --no-cache --verbose lib/**/*.test.js",
+    "posttest": "npm run clean-test-code",
+    "tsc": "tsc",
+    "tscw": "tsc -w",
+    "preversion": "npm run tsc",
+    "postversion": "git push --follow-tags",
+    "prepublishOnly": "npm run tsc && npm run clean-test-code",
+    "clean": "rimraf ./lib && rimraf ./types",
+    "clean-test-code": "rimraf ./lib/**/*.test.js && rimraf ./types/**/*.test.d.ts"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ournet/quotes-data.git"
+  },
+  "keywords": [
+    "quotes",
+    "quotes-data",
+    "data",
+    "ournet"
+  ],
+  "author": "Dumitru Cantea",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ournet/quotes-data/issues"
+  },
+  "homepage": "https://github.com/ournet/quotes-data#readme",
+  "devDependencies": {
+    "@types/boom": "^7.2.0",
+    "@types/node": "latest",
+    "ava": "^0.23.0",
+    "rimraf": "^2.6.2",
+    "typescript": "latest"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.291.0",
+    "boom": "^7.2.0"
+  }
+}
