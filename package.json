@@ -36,14 +36,12 @@
   },
   "homepage": "https://github.com/ournet/quotes-data#readme",
   "devDependencies": {
-    "@types/boom": "^7.2.0",
     "@types/node": "latest",
     "ava": "^0.23.0",
     "rimraf": "^2.6.2",
     "typescript": "latest"
   },
   "dependencies": {
-    "aws-sdk": "^2.291.0",
-    "boom": "^7.2.0"
+    "aws-sdk": "^2.291.0"
   }
 }
