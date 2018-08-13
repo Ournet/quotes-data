@@ -196,4 +196,17 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
             await this.topicQuoteModel.put(item);
         }
     }
+
+    async deleteStorage(): Promise<void> {
+        await Promise.all([
+            this.topicQuoteModel.deleteTable(),
+            this.model.deleteTable(),
+        ]);
+    }
+    async createStorage(): Promise<void> {
+        await Promise.all([
+            this.topicQuoteModel.createTable(),
+            this.model.createTable(),
+        ]);
+    }
 }
