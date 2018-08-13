@@ -4,7 +4,7 @@ import { DynamoQuoteRepository } from './dynamo-quote-repository';
 
 
 export class RepositoryBuilder {
-    static buildQuoteRepository(client: DynamoDB.DocumentClient): QuoteRepository {
-        return new DynamoQuoteRepository(client);
+    static buildQuoteRepository(client: DynamoDB.DocumentClient, tableSuffix: string): QuoteRepository {
+        return new DynamoQuoteRepository(client, tableSuffix);
     }
 }

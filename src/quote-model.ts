@@ -16,14 +16,14 @@ export class QuoteModel extends DynamoModel<QuoteKey, DynamoQuote> {
     localeIndexName() {
         return 'locale-index';
     }
-    constructor(client: DynamoDB.DocumentClient) {
+    constructor(client: DynamoDB.DocumentClient, tableSuffix: string) {
         super({
             hashKey: {
                 name: 'id',
                 type: 'S'
             },
             name: 'quotes',
-            tableName: 'ournet_quotes_v0',
+            tableName: `ournet_quotes_${tableSuffix}`,
             indexes: [
                 {
                     name: 'author-index',

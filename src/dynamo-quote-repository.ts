@@ -27,10 +27,10 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
     protected model: QuoteModel
     protected topicQuoteModel: TopicQuoteModel
 
-    constructor(client: DynamoDB.DocumentClient) {
+    constructor(client: DynamoDB.DocumentClient, tableSuffix: string) {
         super(new QuoteValidator());
-        this.model = new QuoteModel(client);
-        this.topicQuoteModel = new TopicQuoteModel(client);
+        this.model = new QuoteModel(client, tableSuffix);
+        this.topicQuoteModel = new TopicQuoteModel(client, tableSuffix);
     }
 
     async innerCreate(data: Quote) {

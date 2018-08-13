@@ -42,7 +42,7 @@ export class TopicQuoteModel extends DynamoModel<TopicQuoteKey, TopicQuote> {
         return 'topic-rel-last-quotes-index';
     }
 
-    constructor(client: DynamoDB.DocumentClient) {
+    constructor(client: DynamoDB.DocumentClient, tableSuffix: string) {
         super({
             hashKey: {
                 name: 'topicId',
@@ -53,7 +53,7 @@ export class TopicQuoteModel extends DynamoModel<TopicQuoteKey, TopicQuote> {
                 type: 'S'
             },
             name: 'topic_quotes',
-            tableName: 'ournet_topic_quotes_v0',
+            tableName: `ournet_topic_quotes_${tableSuffix}`,
             indexes: [
                 {
                     name: 'topic-last-quotes-index',
