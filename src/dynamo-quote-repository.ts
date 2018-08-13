@@ -13,7 +13,10 @@ import {
     LatestQuotesQueryParams,
     LatestQuotesByTopicQueryParams,
     LatestQuotesByAuthorQueryParams,
-    Topic,
+    QuoteTopic,
+    CountQuotesQueryParams,
+    CountQuotesByTopicQueryParams,
+    CountQuotesByAuthorQueryParams,
 } from '@ournet/quotes-domain';
 
 import { QuoteModel } from './quote-model';
@@ -31,14 +34,15 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
     }
 
     async innerCreate(data: Quote) {
-        const item = DynamoQuoteHelper.mapFromQuote(data);
-        const createdItem = await this.model.create(item);
+        const createdItem = await this.model.create(DynamoQuoteHelper.mapFromQuote(data));
 
-        if (createdItem.topics) {
-            await this.putTopicQuotes(createdItem.id, createdItem.lastFoundAt, createdItem.expiresAt, createdItem.topics);
+        const item = DynamoQuoteHelper.mapToQuote(createdItem);
+
+        if (item.topics) {
+            await this.putTopicQuotes(item.id, item.lastFoundAt, item.expiresAt, item.topics);
         }
 
-        return createdItem;
+        return item;
     }
 
     async innerUpdate(data: RepositoryUpdateData<Quote>) {
@@ -104,9 +108,15 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
     }
 
     async latestByTopic(params: LatestQuotesByTopicQueryParams, options?: RepositoryAccessOptions<Quote>) {
+        let index = this.topicQuoteModel.topicLastQuotesIndexName();
+        let hashKey = params.topicId;
+        if (params.relation) {
+            index = this.topicQuoteModel.topicRelLastQuotesIndexName();
+            hashKey = TopicQuoteHelper.formatTopicRel(params.topicId, params.relation);
+        }
         const result = await this.topicQuoteModel.query({
-            index: this.topicQuoteModel.topicLastQuotesIndexName(),
-            hashKey: params.topicId,
+            index,
+            hashKey,
             limit: params.limit,
             startKey: params.lastFoundAt && { topicId: params.topicId, lastFoundAt: params.lastFoundAt } || undefined,
             order: 'DESC',
@@ -139,7 +149,47 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
         return result.items.map(item => DynamoQuoteHelper.mapToQuote(item));
     }
 
-    protected async putTopicQuotes(quoteId: string, lastFoundAt: string, expiresAt: number, topics: Topic[]) {
+    async count(params: CountQuotesQueryParams) {
+        const localeKey = DynamoQuoteHelper.createLocaleKey(params.country, params.lang);
+        const result = await this.model.query({
+            index: this.model.localeIndexName(),
+            select: 'COUNT',
+            hashKey: localeKey,
+            rangeKey: params.lastFoundAt && { operation: '>', value: params.lastFoundAt } || undefined,
+        });
+
+        return result.count;
+    }
+
+    async countByTopic(params: CountQuotesByTopicQueryParams) {
+        let index = this.topicQuoteModel.topicLastQuotesIndexName();
+        let hashKey = params.topicId;
+        if (params.relation) {
+            index = this.topicQuoteModel.topicRelLastQuotesIndexName();
+            hashKey = TopicQuoteHelper.formatTopicRel(params.topicId, params.relation);
+        }
+        const result = await this.topicQuoteModel.query({
+            index,
+            select: 'COUNT',
+            hashKey,
+            rangeKey: params.lastFoundAt && { operation: '>', value: params.lastFoundAt } || undefined,
+        });
+
+        return result.count;
+    }
+
+    async countByAuthor(params: CountQuotesByAuthorQueryParams) {
+        const result = await this.model.query({
+            index: this.model.authorIndexName(),
+            select: 'COUNT',
+            hashKey: params.authorId,
+            rangeKey: params.lastFoundAt && { operation: '>', value: params.lastFoundAt } || undefined,
+        });
+
+        return result.count;
+    }
+
+    protected async putTopicQuotes(quoteId: string, lastFoundAt: string, expiresAt: number, topics: QuoteTopic[]) {
         const items = TopicQuoteHelper.create(quoteId, lastFoundAt, expiresAt, topics);
 
         for (const item of items) {
