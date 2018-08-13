@@ -96,7 +96,6 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
             hashKey: localeKey,
             limit: params.limit,
             startKey: params.lastFoundAt && { locale: localeKey, lastFoundAt: params.lastFoundAt } || undefined,
-            // rangeKey: params.lastFoundAt && { operation: '>', value: params.lastFoundAt.toISOString() },
             order: 'DESC',
         });
 
@@ -104,7 +103,9 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
             return [];
         }
 
-        return result.items.map(item => DynamoQuoteHelper.mapToQuote(item));
+        const ids = result.items.map(item => item.id);
+
+        return this.getByIds(ids, options);
     }
 
     async latestByTopic(params: LatestQuotesByTopicQueryParams, options?: RepositoryAccessOptions<Quote>) {
@@ -134,11 +135,9 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
     async latestByAuthor(params: LatestQuotesByAuthorQueryParams, options?: RepositoryAccessOptions<Quote>) {
         const result = await this.model.query({
             index: this.model.authorIndexName(),
-            attributes: options && options.fields as string[] | undefined,
             hashKey: params.authorId,
             limit: params.limit,
             startKey: params.lastFoundAt && { authorId: params.authorId, lastFoundAt: params.lastFoundAt } || undefined,
-            // rangeKey: params.lastFoundAt && { operation: '>', value: params.lastFoundAt.toISOString() },
             order: 'DESC',
         });
 
@@ -146,7 +145,9 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
             return [];
         }
 
-        return result.items.map(item => DynamoQuoteHelper.mapToQuote(item));
+        const ids = result.items.map(item => item.id);
+
+        return this.getByIds(ids, options);
     }
 
     async count(params: CountQuotesQueryParams) {
