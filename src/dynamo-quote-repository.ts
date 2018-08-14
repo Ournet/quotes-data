@@ -1,9 +1,12 @@
 
+const debug = require('debug')('ournet:quotes-data');
+
 import DynamoDB = require('aws-sdk/clients/dynamodb');
 import {
     BaseRepository,
     RepositoryUpdateData,
     RepositoryAccessOptions,
+    Dictionary,
 } from '@ournet/domain';
 
 import {
@@ -17,6 +20,7 @@ import {
     CountQuotesQueryParams,
     CountQuotesByTopicQueryParams,
     CountQuotesByAuthorQueryParams,
+    TopItem,
 } from '@ournet/quotes-domain';
 
 import { QuoteModel } from './quote-model';
@@ -39,7 +43,7 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
         const item = DynamoQuoteHelper.mapToQuote(createdItem);
 
         if (item.topics) {
-            await this.putTopicQuotes(item.id, item.lastFoundAt, item.expiresAt, item.topics);
+            await this.putTopicQuotes(item.id, item.lastFoundAt, item.topics);
         }
 
         return item;
@@ -55,7 +59,7 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
         const item = DynamoQuoteHelper.mapToQuote(updatedItem);
 
         if (item.topics && item.topics.length && data.set && data.set.lastFoundAt) {
-            await this.putTopicQuotes(item.id, item.lastFoundAt, item.expiresAt, item.topics);
+            await this.putTopicQuotes(item.id, item.lastFoundAt, item.topics);
         }
 
         return item;
@@ -190,8 +194,81 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
         return result.count;
     }
 
-    protected async putTopicQuotes(quoteId: string, lastFoundAt: string, expiresAt: number, topics: QuoteTopic[]) {
-        const items = TopicQuoteHelper.create(quoteId, lastFoundAt, expiresAt, topics);
+    async topAuthors(params: LatestQuotesQueryParams): Promise<TopItem[]> {
+        const resultIds = await this.model.query({
+            index: this.model.localeIndexName(),
+            hashKey: DynamoQuoteHelper.createLocaleKey(params.country, params.lang),
+            rangeKey: params.lastFoundAt && { operation: '>', value: params.lastFoundAt } || undefined,
+            limit: 100,
+            attributes: ['id']
+        });
+
+        if (!resultIds.items || !resultIds.items.length) {
+            debug(`Top authors result ids is empty`, params);
+            return [];
+        }
+        const ids = resultIds.items.map(item => item.id);
+        const quotes = await this.model.getItems(ids.map(id => ({ id })), { attributes: ['authorId'] });
+
+        if (!quotes.length) {
+            debug(`Top authors quotes by ids is empty`, ids);
+            return [];
+        }
+
+        const topMap: Dictionary<number> = {};
+
+        for (const quote of quotes) {
+            const id = quote.authorId;
+            if (!topMap[id]) {
+                topMap[id] = 1;
+            } else {
+                topMap[id]++;
+            }
+        }
+
+        const topList: TopItem[] = Object.keys(topMap)
+            .map(id => ({ id, count: topMap[id] }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, params.limit);
+
+        return topList;
+    }
+
+    async topTopics(params: LatestQuotesQueryParams): Promise<TopItem[]> {
+        const resultIds = await this.topicQuoteModel.query({
+            index: this.topicQuoteModel.localeLastTopicsIndexName(),
+            hashKey: DynamoQuoteHelper.createLocaleKey(params.country, params.lang),
+            rangeKey: params.lastFoundAt && { operation: '>', value: params.lastFoundAt } || undefined,
+            limit: 100,
+            attributes: ['topicId'],
+        });
+
+        if (!resultIds.items || !resultIds.items.length) {
+            debug(`Top topics result ids is empty`, params);
+            return [];
+        }
+
+        const topMap: Dictionary<number> = {};
+
+        for (const item of resultIds.items) {
+            const id = item.topicId;
+            if (!topMap[id]) {
+                topMap[id] = 1;
+            } else {
+                topMap[id]++;
+            }
+        }
+
+        const topList: TopItem[] = Object.keys(topMap)
+            .map(id => ({ id, count: topMap[id] }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, params.limit);
+
+        return topList;
+    }
+
+    protected async putTopicQuotes(quoteId: string, lastFoundAt: string, topics: QuoteTopic[]) {
+        const items = TopicQuoteHelper.create(quoteId, lastFoundAt, topics);
 
         for (const item of items) {
             await this.topicQuoteModel.put(item);

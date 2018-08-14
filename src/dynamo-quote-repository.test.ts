@@ -250,3 +250,185 @@ test.serial('#query', async t => {
     const quotesTopicMentionRomania = await repository.latestByTopic({ country, lang, topicId: 'qtopic3', relation: 'MENTION', limit: 10 });
     t.is(quotesTopicMentionRomania.length, 1, '1 quotes by topic Romania MENTION');
 })
+
+test.serial('#topAuthors', async t => {
+    const country = 'md';
+    const lang = 'ro';
+    const quotes = [QuoteHelper.build({
+        author: {
+            id: 'qtopic1',
+            name: 'Vlad Filat'
+        },
+        country,
+        lang,
+        source: {
+            host: 'protv.md',
+            path: '/',
+            id: 'mdro3523523525f45yf34f5fy435fu',
+            title: 'Titlu stire'
+        },
+        text: 'Stire importanta 1'
+    }), QuoteHelper.build({
+        author: {
+            id: 'qtopic4',
+            name: 'Vlad Plahotniuc'
+        },
+        country,
+        lang,
+        source: {
+            host: 'protv.md',
+            path: '/',
+            id: 'mdro3523523525f45yf34f5fy435fu',
+            title: 'Titlu stire'
+        },
+        text: 'Stire importanta 2'
+    }), QuoteHelper.build({
+        author: {
+            id: 'qtopic4',
+            name: 'Vlad Plahotniuc'
+        },
+        country,
+        lang,
+        source: {
+            host: 'protv.md',
+            path: '/',
+            id: 'mdro3523523525f45yf34f5fy435fu',
+            title: 'Titlu stire'
+        },
+        text: 'Stire importanta 3'
+    }), QuoteHelper.build({
+        author: {
+            id: 'qtopic5',
+            name: 'Ion Cioalacu'
+        },
+        country,
+        lang,
+        source: {
+            host: 'protv.md',
+            path: '/',
+            id: 'mdro3523523525f45yf34f5fy435fu',
+            title: 'Titlu stire'
+        },
+        text: 'Stire importanta despre 4'
+    }), QuoteHelper.build({
+        author: {
+            id: 'qtopic5',
+            name: 'Ion Cioalacu'
+        },
+        country,
+        lang,
+        source: {
+            host: 'protv.md',
+            path: '/',
+            id: 'mdro3523523525f45yf34f5fy435fu',
+            title: 'Titlu stire'
+        },
+        text: 'Stire importanta despre 5'
+    }), QuoteHelper.build({
+        author: {
+            id: 'qtopic5',
+            name: 'Ion Cioalacu'
+        },
+        country,
+        lang,
+        source: {
+            host: 'protv.md',
+            path: '/',
+            id: 'mdro3523523525f45yf34f5fy435fu',
+            title: 'Titlu stire'
+        },
+        text: 'Stire importanta despre 6'
+    })];
+
+    for (const qoute of quotes) {
+        await repository.create(qoute);
+    }
+
+    const topAuthors = await repository.topAuthors({ country, lang, limit: 10 });
+
+    t.is(topAuthors.length, 3);
+    t.deepEqual(topAuthors[0], { id: 'qtopic5', count: 3 });
+    t.deepEqual(topAuthors[1], { id: 'qtopic4', count: 2 });
+    t.deepEqual(topAuthors[2], { id: 'qtopic1', count: 1 });
+})
+
+test.serial('#topTopics', async t => {
+    const country = 'md';
+    const lang = 'ro';
+    const quotes = [QuoteHelper.build({
+        author: {
+            id: 'qtopic1',
+            name: 'Vlad Filat'
+        },
+        country,
+        lang,
+        source: {
+            host: 'protv.md',
+            path: '/',
+            id: 'mdro3523523525f45yf34f5fy435fu',
+            title: 'Titlu stire'
+        },
+        text: 'Stire importanta despre Romania, RM si Vlad Filat',
+        topics: [
+            {
+                id: 'qtopic1',
+                name: 'Vlad Filat',
+                slug: 'vlad-filat',
+                type: 'PERSON'
+            },
+            {
+                id: 'qtopic2',
+                name: 'Republica Moldova',
+                abbr: 'RM',
+                type: 'PLACE',
+                slug: 'moldova'
+            },
+            {
+                id: 'qtopic3',
+                name: 'Romania',
+                slug: 'romania'
+            }
+        ]
+    }),
+    QuoteHelper.build({
+        author: {
+            id: 'qtopic4',
+            name: 'Vlad Plahotniuc'
+        },
+        country,
+        lang,
+        source: {
+            host: 'protv.md',
+            path: '/',
+            id: 'mdro3523523525f45yf34f5fy435fu',
+            title: 'Titlu stire'
+        },
+        text: 'Stire importanta despre Romania si RM',
+        topics: [
+            {
+                id: 'qtopic2',
+                name: 'Republica Moldova',
+                abbr: 'RM',
+                type: 'PLACE',
+                slug: 'moldova'
+            },
+            {
+                id: 'qtopic3',
+                name: 'Romania',
+                slug: 'romania',
+                rel: 'MENTION'
+            }
+        ]
+    })];
+
+    for (const qoute of quotes) {
+        await repository.create(qoute);
+    }
+
+    const topTopics = await repository.topTopics({ country, lang, limit: 10 });
+
+    t.is(topTopics.length, 3);
+    t.deepEqual(topTopics[0], { id: 'qtopic2', count: 2 });
+    t.deepEqual(topTopics[1], { id: 'qtopic3', count: 2 });
+    t.deepEqual(topTopics[2], { id: 'qtopic1', count: 1 });
+})
