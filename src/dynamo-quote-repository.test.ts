@@ -432,3 +432,120 @@ test.serial('#topTopics', async t => {
     t.deepEqual(topTopics[1], { id: 'qtopic3', count: 2 });
     t.deepEqual(topTopics[2], { id: 'qtopic1', count: 1 });
 })
+
+test.serial('#topAuthorTopics', async t => {
+    const country = 'md';
+    const lang = 'ro';
+    const quotes = [QuoteHelper.build({
+        author: {
+            id: 'qtopic1',
+            name: 'Vlad Filat'
+        },
+        country,
+        lang,
+        source: {
+            host: 'protv.md',
+            path: '/',
+            id: 'mdro3523523525f45yf34f5fy435fu',
+            title: 'Titlu stire'
+        },
+        text: 'Stire importanta despre Romania, RM si Vlad Filat',
+        topics: [
+            {
+                id: 'qtopic1',
+                name: 'Vlad Filat',
+                slug: 'vlad-filat',
+                type: 'PERSON'
+            },
+            {
+                id: 'qtopic2',
+                name: 'Republica Moldova',
+                abbr: 'RM',
+                type: 'PLACE',
+                slug: 'moldova'
+            },
+            {
+                id: 'qtopic3',
+                name: 'Romania',
+                slug: 'romania'
+            }
+        ]
+    }),
+    QuoteHelper.build({
+        author: {
+            id: 'qtopic1',
+            name: 'Vlad Filat'
+        },
+        country,
+        lang,
+        source: {
+            host: 'protv.md',
+            path: '/',
+            id: 'mdro3523523525f45yf34f5fy435fu',
+            title: 'Titlu stire'
+        },
+        text: 'Stire importanta despre Romania, RM si Vlad Filat 2',
+        topics: [
+            {
+                id: 'qtopic6',
+                name: 'Iurie Leanca',
+                slug: 'iurie-leanca',
+                type: 'PERSON'
+            },
+            {
+                id: 'qtopic2',
+                name: 'Republica Moldova',
+                abbr: 'RM',
+                type: 'PLACE',
+                slug: 'moldova'
+            },
+            {
+                id: 'qtopic3',
+                name: 'Romania',
+                slug: 'romania'
+            }
+        ]
+    }),
+    QuoteHelper.build({
+        author: {
+            id: 'qtopic4',
+            name: 'Vlad Plahotniuc'
+        },
+        country,
+        lang,
+        source: {
+            host: 'protv.md',
+            path: '/',
+            id: 'mdro3523523525f45yf34f5fy435fu',
+            title: 'Titlu stire'
+        },
+        text: 'Stire importanta despre Romania si RM',
+        topics: [
+            {
+                id: 'qtopic2',
+                name: 'Republica Moldova',
+                abbr: 'RM',
+                type: 'PLACE',
+                slug: 'moldova'
+            },
+            {
+                id: 'qtopic3',
+                name: 'Romania',
+                slug: 'romania',
+                rel: 'MENTION'
+            }
+        ]
+    })];
+
+    for (const qoute of quotes) {
+        await repository.create(qoute);
+    }
+
+    const topTopics = await repository.topAuthorTopics({ country, lang, limit: 10, authorId: 'qtopic1' });
+
+    t.is(topTopics.length, 4);
+    t.deepEqual(topTopics[0], { id: 'qtopic2', count: 2 });
+    t.deepEqual(topTopics[1], { id: 'qtopic3', count: 2 });
+    t.deepEqual(topTopics[3], { id: 'qtopic1', count: 1 });
+    t.deepEqual(topTopics[2], { id: 'qtopic6', count: 1 });
+})

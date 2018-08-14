@@ -194,6 +194,52 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
         return result.count;
     }
 
+    async topAuthorTopics(params: LatestQuotesByAuthorQueryParams): Promise<TopItem[]> {
+        const result = await this.model.query({
+            index: this.model.authorIndexName(),
+            hashKey: params.authorId,
+            limit: 100,
+            startKey: params.lastFoundAt && { authorId: params.authorId, lastFoundAt: params.lastFoundAt } || undefined,
+            order: 'DESC',
+            attributes: ['id'],
+        });
+
+        if (!result.items || result.items.length === 0) {
+            return [];
+        }
+
+        const ids = result.items.map(item => item.id);
+
+        const quotes = await this.model.getItems(ids.map(id => ({ id })), { attributes: ['topics'] });
+
+        if (!quotes.length) {
+            debug(`Top author's topics by ids is empty`, ids);
+            return [];
+        }
+
+        const topMap: Dictionary<number> = {};
+
+        for (const quote of quotes) {
+            if (quote.topics && quote.topics.length) {
+                for (const topic of quote.topics) {
+                    const id = topic.id;
+                    if (!topMap[id]) {
+                        topMap[id] = 1;
+                    } else {
+                        topMap[id]++;
+                    }
+                }
+            }
+        }
+
+        const topList: TopItem[] = Object.keys(topMap)
+            .map(id => ({ id, count: topMap[id] }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, params.limit);
+
+        return topList;
+    }
+
     async topAuthors(params: LatestQuotesQueryParams): Promise<TopItem[]> {
         const resultIds = await this.model.query({
             index: this.model.localeIndexName(),
