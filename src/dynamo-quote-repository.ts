@@ -26,6 +26,7 @@ import {
 import { QuoteModel } from './quote-model';
 import { DynamoQuoteHelper } from './dynamo-quote';
 import { TopicQuoteModel, TopicQuoteHelper } from './topic-quote-model';
+import { sortEntitiesByIds, buildDateRangeKey } from './helpers';
 
 export class DynamoQuoteRepository extends BaseRepository<Quote> implements QuoteRepository {
     protected model: QuoteModel
@@ -89,17 +90,21 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
     async getByIds(ids: string[], options?: RepositoryAccessOptions<Quote>) {
         const items = await this.model.getItems(ids.map(id => ({ id })), options && { attributes: options.fields });
 
-        return items.map(item => DynamoQuoteHelper.mapToQuote(item));
+        const list = items.map(item => DynamoQuoteHelper.mapToQuote(item));
+
+        return sortEntitiesByIds(ids, list);
     }
 
     async latest(params: LatestQuotesQueryParams, options?: RepositoryAccessOptions<Quote>) {
-        const localeKey = DynamoQuoteHelper.createLocaleKey(params.country, params.lang);
+        const hashKey = DynamoQuoteHelper.createLocaleKey(params);
+        const rangeKey = buildDateRangeKey(params);
+
         const result = await this.model.query({
             index: this.model.localeIndexName(),
             attributes: options && options.fields as string[] | undefined,
-            hashKey: localeKey,
+            hashKey,
             limit: params.limit,
-            startKey: params.lastFoundAt && { locale: localeKey, lastFoundAt: params.lastFoundAt } || undefined,
+            rangeKey,
             order: 'DESC',
         });
 
@@ -114,6 +119,7 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
 
     async latestByTopic(params: LatestQuotesByTopicQueryParams, options?: RepositoryAccessOptions<Quote>) {
         let index = this.topicQuoteModel.topicLastQuotesIndexName();
+        const rangeKey = buildDateRangeKey(params);
         let hashKey = params.topicId;
         if (params.relation) {
             index = this.topicQuoteModel.topicRelLastQuotesIndexName();
@@ -123,7 +129,7 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
             index,
             hashKey,
             limit: params.limit,
-            startKey: params.lastFoundAt && { topicId: params.topicId, lastFoundAt: params.lastFoundAt } || undefined,
+            rangeKey,
             order: 'DESC',
         });
 
@@ -137,11 +143,13 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
     }
 
     async latestByAuthor(params: LatestQuotesByAuthorQueryParams, options?: RepositoryAccessOptions<Quote>) {
+        const rangeKey = buildDateRangeKey(params);
+
         const result = await this.model.query({
             index: this.model.authorIndexName(),
             hashKey: params.authorId,
             limit: params.limit,
-            startKey: params.lastFoundAt && { authorId: params.authorId, lastFoundAt: params.lastFoundAt } || undefined,
+            rangeKey,
             order: 'DESC',
         });
 
@@ -155,12 +163,14 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
     }
 
     async count(params: CountQuotesQueryParams) {
-        const localeKey = DynamoQuoteHelper.createLocaleKey(params.country, params.lang);
+        const hashKey = DynamoQuoteHelper.createLocaleKey(params);
+        const rangeKey = buildDateRangeKey(params);
+
         const result = await this.model.query({
             index: this.model.localeIndexName(),
             select: 'COUNT',
-            hashKey: localeKey,
-            rangeKey: params.lastFoundAt && { operation: '>', value: params.lastFoundAt } || undefined,
+            hashKey,
+            rangeKey,
         });
 
         return result.count;
@@ -168,6 +178,7 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
 
     async countByTopic(params: CountQuotesByTopicQueryParams) {
         let index = this.topicQuoteModel.topicLastQuotesIndexName();
+        const rangeKey = buildDateRangeKey(params);
         let hashKey = params.topicId;
         if (params.relation) {
             index = this.topicQuoteModel.topicRelLastQuotesIndexName();
@@ -177,29 +188,33 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
             index,
             select: 'COUNT',
             hashKey,
-            rangeKey: params.lastFoundAt && { operation: '>', value: params.lastFoundAt } || undefined,
+            rangeKey,
         });
 
         return result.count;
     }
 
     async countByAuthor(params: CountQuotesByAuthorQueryParams) {
+        const rangeKey = buildDateRangeKey(params);
+
         const result = await this.model.query({
             index: this.model.authorIndexName(),
             select: 'COUNT',
             hashKey: params.authorId,
-            rangeKey: params.lastFoundAt && { operation: '>', value: params.lastFoundAt } || undefined,
+            rangeKey,
         });
 
         return result.count;
     }
 
     async topAuthorTopics(params: LatestQuotesByAuthorQueryParams): Promise<TopItem[]> {
+        const rangeKey = buildDateRangeKey(params);
+
         const result = await this.model.query({
             index: this.model.authorIndexName(),
             hashKey: params.authorId,
             limit: 100,
-            startKey: params.lastFoundAt && { authorId: params.authorId, lastFoundAt: params.lastFoundAt } || undefined,
+            rangeKey,
             order: 'DESC',
             attributes: ['id'],
         });
@@ -241,12 +256,15 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
     }
 
     async topAuthors(params: LatestQuotesQueryParams): Promise<TopItem[]> {
+        const hashKey = DynamoQuoteHelper.createLocaleKey(params);
+        const rangeKey = buildDateRangeKey(params);
+
         const resultIds = await this.model.query({
             index: this.model.localeIndexName(),
-            hashKey: DynamoQuoteHelper.createLocaleKey(params.country, params.lang),
-            rangeKey: params.lastFoundAt && { operation: '>', value: params.lastFoundAt } || undefined,
+            hashKey,
+            rangeKey,
             limit: 100,
-            attributes: ['id']
+            attributes: ['id'],
         });
 
         if (!resultIds.items || !resultIds.items.length) {
@@ -281,10 +299,13 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
     }
 
     async topTopics(params: LatestQuotesQueryParams): Promise<TopItem[]> {
+        const hashKey = DynamoQuoteHelper.createLocaleKey(params);
+        const rangeKey = buildDateRangeKey(params);
+
         const resultIds = await this.topicQuoteModel.query({
             index: this.topicQuoteModel.localeLastTopicsIndexName(),
-            hashKey: DynamoQuoteHelper.createLocaleKey(params.country, params.lang),
-            rangeKey: params.lastFoundAt && { operation: '>', value: params.lastFoundAt } || undefined,
+            hashKey,
+            rangeKey,
             limit: 100,
             attributes: ['topicId'],
         });

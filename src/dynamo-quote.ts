@@ -1,4 +1,5 @@
 import { Quote, QuoteHelper } from "@ournet/quotes-domain";
+import { Locale } from "./helpers";
 
 export interface DynamoQuote extends Quote {
     /** COUNTRY_LANG */
@@ -10,13 +11,13 @@ export interface DynamoQuote extends Quote {
 export class DynamoQuoteHelper {
     static createLocaleFromId(quoteId: string) {
         const quote = QuoteHelper.parseLocaleFromId(quoteId);
-        const locale = DynamoQuoteHelper.createLocaleKey(quote.country, quote.lang);
+        const locale = DynamoQuoteHelper.createLocaleKey(quote);
 
         return locale;
     }
 
-    static createLocaleKey(country: string, lang: string) {
-        return `${country.toUpperCase()}_${lang.toUpperCase()}`;
+    static createLocaleKey(locale: Locale) {
+        return `${locale.country.toUpperCase()}_${locale.lang.toUpperCase()}`;
     }
 
     static mapFromQuote(quote: Quote) {
