@@ -3,8 +3,8 @@ import { QuoteRepository } from '@ournet/quotes-domain';
 import { DynamoQuoteRepository } from './dynamo-quote-repository';
 
 
-export class RepositoryBuilder {
-    static buildQuoteRepository(client: DynamoDB.DocumentClient, tableSuffix: string = 'v0'): QuoteRepository {
+export class QuoteRepositoryBuilder {
+    static build(client: DynamoDB.DocumentClient, tableSuffix: string = 'v0'): QuoteRepository {
         return new DynamoQuoteRepository(client, tableSuffix);
     }
 }

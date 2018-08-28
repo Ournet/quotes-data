@@ -1,4 +1,4 @@
 
 export {
-    RepositoryBuilder,
+    QuoteRepositoryBuilder,
 } from './repository-builder';
