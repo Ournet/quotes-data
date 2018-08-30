@@ -38,6 +38,7 @@ test.serial('#create', async t => {
     const initialQuote: Quote = QuoteHelper.build({
         author: {
             id: 'qtopic1',
+            slug: 'qtopic1',
             name: 'Vlad Filat'
         },
         country: 'md',
@@ -83,6 +84,7 @@ test.serial('#update', async t => {
     const initialQuote: Quote = QuoteHelper.build({
         author: {
             id: 'qtopic1',
+            slug: 'qtopic1',
             name: 'Vlad Filat'
         },
         country: 'md',
@@ -124,7 +126,7 @@ test.serial('#update', async t => {
     await t.throws(repository.update({ id: initialQuote.id, set: { country: 'ru' } }), /"country" is not allowed/);
     await t.throws(repository.update({ id: initialQuote.id, set: { lang: 'ru' } }), /"lang" is not allowed/);
     await t.throws(repository.update({ id: initialQuote.id, set: { text: 'new text' } }), /"text" is not allowed/);
-    await t.throws(repository.update({ id: initialQuote.id, set: { author: { id: 'newid', name: 'Name' } } }), /"author" is not allowed/);
+    await t.throws(repository.update({ id: initialQuote.id, set: { author: { id: 'newid',slug: 'qtopic1', name: 'Name' } } }), /"author" is not allowed/);
 
     const updatedQuote = await repository.update({
         id: initialQuote.id,
@@ -144,6 +146,7 @@ test.serial('#query', async t => {
     const initialQuote1: Quote = QuoteHelper.build({
         author: {
             id: 'qtopic1',
+            slug: 'qtopic1',
             name: 'Vlad Filat'
         },
         country,
@@ -180,6 +183,7 @@ test.serial('#query', async t => {
     const initialQuote2: Quote = QuoteHelper.build({
         author: {
             id: 'qtopic4',
+            slug: 'qtopic1',
             name: 'Vlad Plahotniuc'
         },
         country,
@@ -257,6 +261,7 @@ test.serial('#topAuthors', async t => {
     const quotes = [QuoteHelper.build({
         author: {
             id: 'qtopic1',
+            slug: 'qtopic1',
             name: 'Vlad Filat'
         },
         country,
@@ -271,6 +276,7 @@ test.serial('#topAuthors', async t => {
     }), QuoteHelper.build({
         author: {
             id: 'qtopic4',
+            slug: 'qtopic1',
             name: 'Vlad Plahotniuc'
         },
         country,
@@ -285,6 +291,7 @@ test.serial('#topAuthors', async t => {
     }), QuoteHelper.build({
         author: {
             id: 'qtopic4',
+            slug: 'qtopic1',
             name: 'Vlad Plahotniuc'
         },
         country,
@@ -299,6 +306,7 @@ test.serial('#topAuthors', async t => {
     }), QuoteHelper.build({
         author: {
             id: 'qtopic5',
+            slug: 'qtopic1',
             name: 'Ion Cioalacu'
         },
         country,
@@ -313,6 +321,7 @@ test.serial('#topAuthors', async t => {
     }), QuoteHelper.build({
         author: {
             id: 'qtopic5',
+            slug: 'qtopic1',
             name: 'Ion Cioalacu'
         },
         country,
@@ -327,6 +336,7 @@ test.serial('#topAuthors', async t => {
     }), QuoteHelper.build({
         author: {
             id: 'qtopic5',
+            slug: 'qtopic1',
             name: 'Ion Cioalacu'
         },
         country,
@@ -358,6 +368,7 @@ test.serial('#topTopics', async t => {
     const quotes = [QuoteHelper.build({
         author: {
             id: 'qtopic1',
+            slug: 'qtopic1',
             name: 'Vlad Filat'
         },
         country,
@@ -393,6 +404,7 @@ test.serial('#topTopics', async t => {
     QuoteHelper.build({
         author: {
             id: 'qtopic4',
+            slug: 'qtopic1',
             name: 'Vlad Plahotniuc'
         },
         country,
@@ -439,6 +451,7 @@ test.serial('#topAuthorTopics', async t => {
     const quotes = [QuoteHelper.build({
         author: {
             id: 'qtopic1',
+            slug: 'qtopic1',
             name: 'Vlad Filat'
         },
         country,
@@ -474,6 +487,7 @@ test.serial('#topAuthorTopics', async t => {
     QuoteHelper.build({
         author: {
             id: 'qtopic1',
+            slug: 'qtopic1',
             name: 'Vlad Filat'
         },
         country,
@@ -509,6 +523,7 @@ test.serial('#topAuthorTopics', async t => {
     QuoteHelper.build({
         author: {
             id: 'qtopic4',
+            slug: 'qtopic1',
             name: 'Vlad Plahotniuc'
         },
         country,

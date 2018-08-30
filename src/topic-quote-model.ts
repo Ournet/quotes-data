@@ -73,7 +73,7 @@ export class TopicQuoteModel extends DynamoModel<TopicQuoteKey, TopicQuote> {
                 type: 'S'
             },
             name: 'topic_quotes',
-            tableName: `ournet_topic_quotes_${tableSuffix}`,
+            tableName: `ournet_quotes__topic_${tableSuffix}`,
             indexes: [
                 {
                     name: 'topic-last-quotes-index',
