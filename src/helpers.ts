@@ -1,5 +1,5 @@
 import { BaseEntity, BaseEntityId } from "@ournet/domain";
-import { DynamoQueryRangeKey } from "dynamo-model";
+import { DynamoQueryRangeKey } from "dynamo-item";
 
 export type Locale = {
     country: string

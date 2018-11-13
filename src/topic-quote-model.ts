@@ -1,7 +1,7 @@
 import DynamoDB = require('aws-sdk/clients/dynamodb');
 import {
-    DynamoModel,
-} from 'dynamo-model';
+    DynamoItem,
+} from 'dynamo-item';
 import { QuoteTopic, QuoteTopicRelation } from '@ournet/quotes-domain';
 import { DynamoQuoteHelper } from './dynamo-quote';
 import { TOPIC_QUOTE_EXPIRE_DAYS } from './config';
@@ -51,7 +51,7 @@ export class TopicQuoteHelper {
     }
 }
 
-export class TopicQuoteModel extends DynamoModel<TopicQuoteKey, TopicQuote> {
+export class TopicQuoteModel extends DynamoItem<TopicQuoteKey, TopicQuote> {
     localeLastTopicsIndexName() {
         return 'locale-last-topics-index';
     }
@@ -121,6 +121,6 @@ export class TopicQuoteModel extends DynamoModel<TopicQuoteKey, TopicQuote> {
                     }
                 }
             ]
-        }, client);
+        }, client as any);
     }
 }

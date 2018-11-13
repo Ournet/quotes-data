@@ -44,6 +44,9 @@
     "typescript": "latest"
   },
   "dependencies": {
-    "aws-sdk": "^2.291.0"
+    "@ournet/domain": "^0.3.3",
+    "@ournet/quotes-domain": "^0.1.0",
+    "aws-sdk": "^2.291.0",
+    "dynamo-item": "^0.1.1"
   }
 }

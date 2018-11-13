@@ -1,7 +1,7 @@
 import DynamoDB = require('aws-sdk/clients/dynamodb');
 import {
-    DynamoModel,
-} from 'dynamo-model';
+    DynamoItem,
+} from 'dynamo-item';
 
 import { DynamoQuote } from './dynamo-quote';
 
@@ -9,7 +9,7 @@ export type QuoteKey = {
     id: string
 }
 
-export class QuoteModel extends DynamoModel<QuoteKey, DynamoQuote> {
+export class QuoteModel extends DynamoItem<QuoteKey, DynamoQuote> {
     authorIndexName() {
         return 'author-index';
     }
@@ -56,6 +56,6 @@ export class QuoteModel extends DynamoModel<QuoteKey, DynamoQuote> {
                     }
                 }
             ]
-        }, client);
+        }, client as any);
     }
 }
