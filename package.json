@@ -1,6 +1,6 @@
 {
   "name": "@ournet/quotes-data",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Ournet quotes data module",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -36,17 +36,17 @@
   },
   "homepage": "https://github.com/ournet/quotes-data#readme",
   "devDependencies": {
-    "@types/node": "latest",
+    "@types/node": "10.12.7",
     "ava": "^0.25.0",
-    "debug": "^3.1.0",
+    "debug": "^4.1.0",
     "dynamodb-local": "^0.0.22",
     "rimraf": "^2.6.2",
-    "typescript": "latest"
+    "typescript": "3.1.6"
   },
   "dependencies": {
     "@ournet/domain": "^0.3.3",
     "@ournet/quotes-domain": "^0.1.0",
-    "aws-sdk": "^2.291.0",
+    "aws-sdk": "^2.354.0",
     "dynamo-item": "^0.1.1"
   }
 }
