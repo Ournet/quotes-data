@@ -59,22 +59,22 @@
     pretty-ms "^0.2.1"
     text-table "^0.2.0"
 
-"@ournet/domain@^0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@ournet/domain/-/domain-0.3.3.tgz#549e495b41141b596e816c0eef705d4bbea6c0fd"
-  integrity sha512-YilpjstmvRJ1Mq8+mEabp6iT6M5U/RBzCoq3p55bqW3qMXaTHtDixXqZOcF9YqR+pLLgc2KsNcRKkyJAW+FPIA==
+"@ournet/domain@~0.3.x":
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/@ournet/domain/-/domain-0.3.4.tgz#59a8fb3c13a38b3a82601e9c3fbde40eee9d7c93"
+  integrity sha512-PNpVFhgtOlgQGeRkjQWZjBkbP7edHzX6LZRNteXk2/sjO55kg/Bf7JahbxywZ6K+WQsjWpbUJgtHHHS7aoqaAQ==
   dependencies:
     atonic "^1.0.4"
     ava "^0.25.0"
     joi "^14.0.3"
     normalize-url "^3.2.0"
 
-"@ournet/quotes-domain@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@ournet/quotes-domain/-/quotes-domain-0.1.0.tgz#8c15377d2d44d5caa7b6f8effb1b0401b8ed3c87"
-  integrity sha512-Arv6L4AkWAgRQt5kcjeQrSbxdqzPIGOyFCyU6dwsxbKVaqxpD5on+M5ddJfHTmz9rgUodB/a+SjqYISnEmsDFw==
+"@ournet/quotes-domain@~0.2.x":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@ournet/quotes-domain/-/quotes-domain-0.2.0.tgz#44d923600feed4dca50356752f1594d60e0a867c"
+  integrity sha512-+DXzuhLY+sooBE6aMg8hd9swDelQLAjX5T2jzocTgOUv3IT1owtKVTtsZevo8Q1KhGsgB6zg6UQi/EH36FqaVQ==
   dependencies:
-    "@ournet/domain" "^0.3.3"
+    "@ournet/domain" "~0.3.x"
     ellipsize "^0.1.0"
     joi "^14.0.6"
 
@@ -1232,7 +1232,7 @@ dynamo-input@^0.1.0:
   dependencies:
     aws-sdk "^2.286.2"
 
-dynamo-item@^0.1.1:
+dynamo-item@~0.1.x:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/dynamo-item/-/dynamo-item-0.1.1.tgz#c69e39d490a8c5dcee90aaae7f6c50f153ad862a"
   integrity sha512-VN/2TpppDKrLAJ+xO58gKmZy6MmidkiReRjulSwpxuWoIpWceLxh8MfEcSgo4UQUi7AxkaPOL6gfJwn95DhwcQ==
