@@ -10,6 +10,9 @@ export type QuoteKey = {
 }
 
 export class QuoteModel extends DynamoItem<QuoteKey, DynamoQuote> {
+    authorPopularityIndexName() {
+        return 'author-popularity-index';
+    }
     authorIndexName() {
         return 'author-index';
     }
@@ -25,6 +28,21 @@ export class QuoteModel extends DynamoItem<QuoteKey, DynamoQuote> {
             name: 'quotes',
             tableName: `ournet_quotes_${tableSuffix}`,
             indexes: [
+                {
+                    name: 'author-popularity-index',
+                    hashKey: {
+                        name: 'authorId',
+                        type: 'S'
+                    },
+                    rangeKey: {
+                        name: 'popularity',
+                        type: 'N'
+                    },
+                    type: 'GLOBAL',
+                    projection: {
+                        type: 'KEYS_ONLY',
+                    }
+                },
                 {
                     name: 'author-index',
                     hashKey: {

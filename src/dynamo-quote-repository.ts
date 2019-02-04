@@ -7,15 +7,16 @@ import {
     RepositoryUpdateData,
     RepositoryAccessOptions,
     Dictionary,
+    uniq,
 } from '@ournet/domain';
 
 import {
     Quote,
     QuoteValidator,
     QuoteRepository,
-    LatestQuotesQueryParams,
-    LatestQuotesByTopicQueryParams,
-    LatestQuotesByAuthorQueryParams,
+    ListQuotesQueryParams,
+    ListQuotesByTopicQueryParams,
+    ListQuotesByAuthorQueryParams,
     QuoteTopic,
     CountQuotesQueryParams,
     CountQuotesByTopicQueryParams,
@@ -95,7 +96,46 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
         return sortEntitiesByIds(ids, list);
     }
 
-    async latest(params: LatestQuotesQueryParams, options?: RepositoryAccessOptions<Quote>) {
+    async popularQuotes(_params: ListQuotesQueryParams, _options?: RepositoryAccessOptions<Quote> | undefined): Promise<Quote[]> {
+        throw new Error("Method not implemented.");
+    }
+    async popularQuotesByTopic(_params: ListQuotesByTopicQueryParams, _options?: RepositoryAccessOptions<Quote> | undefined): Promise<Quote[]> {
+        throw new Error("Method not implemented.");
+    }
+    async popularQuotesByAuthor(params: ListQuotesByAuthorQueryParams, options?: RepositoryAccessOptions<Quote> | undefined): Promise<Quote[]> {
+
+        const result = await this.model.query({
+            index: this.model.authorPopularityIndexName(),
+            hashKey: params.authorId,
+            limit: params.limit,
+            order: 'DESC',
+        });
+
+        if (!result.items || result.items.length === 0) {
+            return [];
+        }
+
+        const ids = uniq(result.items.map(item => item.id));
+
+        return this.getByIds(ids, options);
+    }
+    countPopularQuotes(_params: CountQuotesQueryParams): Promise<number> {
+        throw new Error("Method not implemented.");
+    }
+    countPopularQuotesByTopic(_params: CountQuotesByTopicQueryParams): Promise<number> {
+        throw new Error("Method not implemented.");
+    }
+    async countPopularQuotesByAuthor(params: CountQuotesByAuthorQueryParams): Promise<number> {
+        const result = await this.model.query({
+            index: this.model.authorPopularityIndexName(),
+            hashKey: params.authorId,
+            select: 'COUNT',
+        });
+
+        return result.count;
+    }
+
+    async latest(params: ListQuotesQueryParams, options?: RepositoryAccessOptions<Quote>) {
         const hashKey = DynamoQuoteHelper.createLocaleKey(params);
         const rangeKey = buildDateRangeKey(params);
 
@@ -117,7 +157,7 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
         return this.getByIds(ids, options);
     }
 
-    async latestByTopic(params: LatestQuotesByTopicQueryParams, options?: RepositoryAccessOptions<Quote>) {
+    async latestByTopic(params: ListQuotesByTopicQueryParams, options?: RepositoryAccessOptions<Quote>) {
         let index = this.topicQuoteModel.topicLastQuotesIndexName();
         const rangeKey = buildDateRangeKey(params);
         let hashKey = params.topicId;
@@ -142,7 +182,7 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
         return this.getByIds(ids, options);
     }
 
-    async latestByAuthor(params: LatestQuotesByAuthorQueryParams, options?: RepositoryAccessOptions<Quote>) {
+    async latestByAuthor(params: ListQuotesByAuthorQueryParams, options?: RepositoryAccessOptions<Quote>) {
         const rangeKey = buildDateRangeKey(params);
 
         const result = await this.model.query({
@@ -207,7 +247,7 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
         return result.count;
     }
 
-    async topAuthorTopics(params: LatestQuotesByAuthorQueryParams): Promise<TopItem[]> {
+    async topAuthorTopics(params: ListQuotesByAuthorQueryParams): Promise<TopItem[]> {
         const rangeKey = buildDateRangeKey(params);
 
         const result = await this.model.query({
@@ -255,7 +295,7 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
         return topList;
     }
 
-    async topAuthors(params: LatestQuotesQueryParams): Promise<TopItem[]> {
+    async topAuthors(params: ListQuotesQueryParams): Promise<TopItem[]> {
         const hashKey = DynamoQuoteHelper.createLocaleKey(params);
         const rangeKey = buildDateRangeKey(params);
 
@@ -298,7 +338,7 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
         return topList;
     }
 
-    async topTopics(params: LatestQuotesQueryParams): Promise<TopItem[]> {
+    async topTopics(params: ListQuotesQueryParams): Promise<TopItem[]> {
         const hashKey = DynamoQuoteHelper.createLocaleKey(params);
         const rangeKey = buildDateRangeKey(params);
 
