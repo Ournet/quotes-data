@@ -59,7 +59,7 @@
     pretty-ms "^0.2.1"
     text-table "^0.2.0"
 
-"@ournet/domain@~0.3.x":
+"@ournet/domain@~0.x.x":
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/@ournet/domain/-/domain-0.3.4.tgz#59a8fb3c13a38b3a82601e9c3fbde40eee9d7c93"
   integrity sha512-PNpVFhgtOlgQGeRkjQWZjBkbP7edHzX6LZRNteXk2/sjO55kg/Bf7JahbxywZ6K+WQsjWpbUJgtHHHS7aoqaAQ==
@@ -69,12 +69,12 @@
     joi "^14.0.3"
     normalize-url "^3.2.0"
 
-"@ournet/quotes-domain@~0.2.x":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@ournet/quotes-domain/-/quotes-domain-0.2.0.tgz#44d923600feed4dca50356752f1594d60e0a867c"
-  integrity sha512-+DXzuhLY+sooBE6aMg8hd9swDelQLAjX5T2jzocTgOUv3IT1owtKVTtsZevo8Q1KhGsgB6zg6UQi/EH36FqaVQ==
+"@ournet/quotes-domain@~0.x.x":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@ournet/quotes-domain/-/quotes-domain-0.3.1.tgz#37561aa57103d555eb6edb00199853bc4b3f76b6"
+  integrity sha512-tBdux5EnOpe/7PJGVO5UDqWD0+QRpRIbDlq1hRqiA0BQ4lmlQqqZB+ng+nI7hBSVdDotZFH7Gzg7VoDW41y9mA==
   dependencies:
-    "@ournet/domain" "~0.3.x"
+    "@ournet/domain" "~0.x.x"
     ellipsize "^0.1.0"
     joi "^14.0.6"
 
@@ -1688,9 +1688,9 @@ has-yarn@^1.0.0:
   integrity sha1-ieJdtgS3Jcj1l2//Ct3JIbgopac=
 
 hoek@6.x.x:
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/hoek/-/hoek-6.0.3.tgz#7884360426d927865a0a1251fc9c59313af5b798"
-  integrity sha512-TU6RyZ/XaQCTWRLrdqZZtZqwxUVr6PDMfi6MlWNURZ7A6czanQqX4pFE1mdOUQR9FdPCsZ0UzL8jI/izZ+eBSQ==
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/hoek/-/hoek-6.1.2.tgz#99e6d070561839de74ee427b61aa476bd6bddfd6"
+  integrity sha512-6qhh/wahGYZHFSFw12tBbJw5fsAhhwrrG/y3Cs0YMTv2WzMnL0oLPnQJjv1QJvEfylRSOFuP+xCu+tdx0tD16Q==
 
 home-or-tmp@^2.0.0:
   version "2.0.0"
@@ -2105,10 +2105,19 @@ jmespath@0.15.0:
   resolved "https://registry.yarnpkg.com/jmespath/-/jmespath-0.15.0.tgz#a3f222a9aae9f966f5d27c796510e28091764217"
   integrity sha1-o/Iiqarp+Wb10nx5ZRDigJF2Qhc=
 
-joi@^14.0.3, joi@^14.0.6:
+joi@^14.0.3:
   version "14.0.6"
   resolved "https://registry.yarnpkg.com/joi/-/joi-14.0.6.tgz#8c72314af6dba13ca48028a4f0af992ddc5a7472"
   integrity sha512-mKXPSNYMG3taVBZemQj3pPOlMZGrnnu14JKAC6AHg6jJVX35L7oDk89ss1sHj+laDSEh3mD2PmeheI5k6Aw8nQ==
+  dependencies:
+    hoek "6.x.x"
+    isemail "3.x.x"
+    topo "3.x.x"
+
+joi@^14.0.6:
+  version "14.3.1"
+  resolved "https://registry.yarnpkg.com/joi/-/joi-14.3.1.tgz#164a262ec0b855466e0c35eea2a885ae8b6c703c"
+  integrity sha512-LQDdM+pkOrpAn4Lp+neNIFV3axv1Vna3j38bisbQhETPMANYRbFJFUyOZcOClYvM/hppMhGWuKSFEK9vjrB+bQ==
   dependencies:
     hoek "6.x.x"
     isemail "3.x.x"

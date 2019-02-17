@@ -96,12 +96,6 @@ export class DynamoQuoteRepository extends BaseRepository<Quote> implements Quot
         return sortEntitiesByIds(ids, list);
     }
 
-    async popularQuotes(_params: ListQuotesQueryParams, _options?: RepositoryAccessOptions<Quote> | undefined): Promise<Quote[]> {
-        throw new Error("Method not implemented.");
-    }
-    async popularQuotesByTopic(_params: ListQuotesByTopicQueryParams, _options?: RepositoryAccessOptions<Quote> | undefined): Promise<Quote[]> {
-        throw new Error("Method not implemented.");
-    }
     async popularQuotesByAuthor(params: ListQuotesByAuthorQueryParams, options?: RepositoryAccessOptions<Quote> | undefined): Promise<Quote[]> {
 
         const result = await this.model.query({
